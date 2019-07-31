@@ -27,9 +27,4 @@ void main(){
 
 根据四元数与复数的相似性，那么有可能可以表示一个旋转三维的一个点q=[cos(th),sin(th)v]
 现在假设有一个绕k轴旋转45&deg;的q，那q就变成了q=[&radic;2/2,&radic;2/2k]，然后选择一个p，p与k正交p=[0,2i],计算p'=pq, p'=[&radic;2/2,&radic;2/2k][0,2i]=[0,&radic;2i+&radic;2j]
-
-
-
-![](http://latex.codecogs.com/gif.latex?\\frac{1}{1+sin(x)})
-
-<a href="https://www.codecogs.com/eqnedit.php?latex=\sum" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\sum" title="\sum" /></a>
+<a href="https://www.codecogs.com/eqnedit.php?latex={p}'=\sqrt{^2{\sqrt{2}}&plus;^2{\sqrt{2}}}=2" target="_blank"><img src="https://latex.codecogs.com/gif.latex?{p}'=\sqrt{^2{\sqrt{2}}&plus;^2{\sqrt{2}}}=2" title="{p}'=\sqrt{^2{\sqrt{2}}+^2{\sqrt{2}}}=2" /></a>
