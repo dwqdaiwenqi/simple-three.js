@@ -1,5 +1,5 @@
-# simple-three
-手撕一个简单的three.js库，用于说明webgl原理，不要用于生产环境
+# simple-three.js
+手撕一个简单的three.js库，用于说明webgl原理，不要用到生产环境
 
 实现了Scene,WebGLRenderer,PerspectiveCamera, AmbientLight, Geometry, Group,MeshLambertMaterial、MeshPhongMaterial、Mesh 等常用核心的功能
 
