@@ -3,13 +3,13 @@
 
 实现了Scene,WebGLRenderer,PerspectiveCamera, AmbientLight, Geometry, Group,MeshLambertMaterial、MeshPhongMaterial、Mesh 等常用核心的功能
 
-# 目录
-## 番外
+## 目录
+### 番外
 * webgl与四元数
-## 正片
+### 正片
 * 创建一个场景
 
-# 使用
+## 使用
 ```js
  import owo from '../src/owo-gl.js'
 
@@ -23,4 +23,5 @@
 ```
 
 
-
+## LISCENSE
+MIT
