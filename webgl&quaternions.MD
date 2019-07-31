@@ -28,3 +28,7 @@ void main(){
 根据四元数与复数的相似性，那么有可能可以表示一个旋转三维的一个点q=[cos(th),sin(th)v]
 现在假设有一个绕k轴旋转45&deg;的q，那q就变成了q=[&radic;2/2,&radic;2/2k]，然后选择一个p，p与k正交p=[0,2i],计算p'=pq, p'=[&radic;2/2,&radic;2/2k][0,2i]=[0,&radic;2i+&radic;2j]
 
+
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
