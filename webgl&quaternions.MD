@@ -30,3 +30,5 @@ void main(){
 
 
 n<sup>2</sup>=n+1
+
+&radic;5
