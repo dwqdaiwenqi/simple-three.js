@@ -71,6 +71,10 @@ requestAnimationFrame(function animate(){
 注释已经很详细了，不多说了，注意这里的q_，因为旋转轴单位化过了，所以这里q的共轭和q的逆是一样的，对虚部取反就行了`-sin(th/2)`,还有就是`multiply`是计算四元数之间的乘法，[这一篇](https://www.3dgep.com/understanding-quaternions/)也有乘法的推导过程，`multiply`使用的是四元数乘积的一般式。
 
 
+用四元数来旋转模型，四元数乘法可以提取pq各分类的线性组合转换到旋转矩阵
+
+
+
 
 
 
