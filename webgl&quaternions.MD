@@ -21,10 +21,12 @@ void main(){
   gl_Position = projection_matrix*(quaternions_matrix*mov_matrix)*a_position;
 }
 ```
-在获得旋转四元数矩阵前，得知道一个点是如何利用四元数进行旋转的。接下来简单的进行四元数的说明，并推导出旋转四元数的一般式q=[cos(th/2),sin(th/2)v]
+在获得旋转四元数矩阵前，得知道一个点是如何利用四元数进行旋转的。接下来说说为啥要用就四元数，以及我对四元数的认识
 
-四元数是由一个实数和三个虚数数组成的复数（超复数）
+一般情况下描述一个物体的姿态会使用欧拉角，通过先给定旋转序列xyz，yxz，zxy...，接着再旋转三个角进行物体的姿态控制，有时候你会发现，通过这种方式进行旋转，物体的朝向并不是你期望的，应为你可能旋转了一个90度，导致一个失去了一个自由度，物体不正确了，产生了**欧拉角万向死锁
 
-根据四元数与复数的相似性，那么有可能可以表示一个旋转三维的一个点q=[cos(th),sin(th)v]
-现在假设有一个绕k轴旋转45&deg;的q，那q就变成了q=[&radic;2/2,&radic;2/2k]，然后选择一个p，p与k正交p=[0,2i],计算p'=pq, p'=[&radic;2/2,&radic;2/2k][0,2i]=[0,&radic;2i+&radic;2j]
-<a href="https://www.codecogs.com/eqnedit.php?latex={p}'=\sqrt{^2{\sqrt{2}}&plus;^2{\sqrt{2}}}=2" target="_blank"><img src="https://latex.codecogs.com/gif.latex?{p}'=\sqrt{^2{\sqrt{2}}&plus;^2{\sqrt{2}}}=2" title="{p}'=\sqrt{^2{\sqrt{2}}+^2{\sqrt{2}}}=2" /></a>
+
+
+
+
+
