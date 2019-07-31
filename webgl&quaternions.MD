@@ -29,4 +29,4 @@ void main(){
 现在假设有一个绕k轴旋转45度的q，那q就变成了q=[2/]
 
 
-<aaa></aaa>
+n<sup>2</sup>=n+1
