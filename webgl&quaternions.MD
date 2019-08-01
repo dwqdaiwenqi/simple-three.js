@@ -137,7 +137,9 @@ requestAnimationFrame(function animate(){
 
 
 ### OuO
-觉得有用的不错的可以去 https://github.com/dwqdaiwenqi/simple-three.js 查看并点个赞，后面的一步步实现three.js库文章都会在里面更新~
+觉得有用不错的可以去 https://github.com/dwqdaiwenqi/simple-three.js 查看并点个赞~
+
+后面的一步步实（手）现（斯）three.js引擎文章都会在里面更新~
 
 ### 参考
 
