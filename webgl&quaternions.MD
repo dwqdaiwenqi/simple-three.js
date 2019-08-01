@@ -72,8 +72,9 @@ requestAnimationFrame(function animate(){
 ```
 注释已经很详细了，不多说了，注意这里的q_，因为旋转轴单位化过了，所以这里q的共轭和q的逆是一样的，对虚部取反就行了`-sin(th/2)`,还有就是`multiply`是计算四元数之间的乘法，[这一篇understanding-quaternions](https://www.3dgep.com/understanding-quaternions/)也有乘法的推导过程，`multiply`使用的是四元数乘积的一般式。
 
-戳这个[demo](https://www.xy.com/fed/gl/webgl&quaternions.html)，如下，一个cone绕了一个轴进行旋转：
-<img src="https://raw.githubusercontent.com/dwqdaiwenqi/Flocking/master/flocking2d.gif"/>
+戳这个[demo](https://www.xy.com/fed/gl/webgl&quaternions.html)，如下，一个cone围绕一个轴进行四元数旋转：
+
+<img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions1.gif"/>
 
 
 
