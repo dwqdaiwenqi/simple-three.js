@@ -16,10 +16,23 @@ gl.drawArrays(gl.LINE_STRIP, 0, 2)
 ```glsl
 //...
 void main(){
+  // projection_matrix是投影矩阵
   // quaternions_matrix是旋转四元数矩阵
   // mov_matrix是平移矩阵
   gl_Position = projection_matrix*(quaternions_matrix*mov_matrix)*a_position;
 }
+```
+cone模型对象的quaternions_matrix属性赋值为旋转四元数矩阵，render中往着色器中quaternions_matrix变量地址传递数据：
+```js
+//...
+cone.quaternions_matrix = new Float32Array([
+ ...  //4*4
+])
+
+//...
+//render中
+gl.uniformMatrix4fv(this.qua_location, false, this.quaternions_matrix]))
+ 
 ```
 在获得旋转四元数矩阵前，得知道一个点是如何利用四元数进行旋转的。接下来说说为啥要用就四元数，以及我对四元数的认识
 
@@ -102,7 +115,7 @@ requestAnimationFrame(function animate(){
 
 戳这个[demo](https://www.xy.com/fed/gl/webgl&quaternions.html)，cone模型朝着目标方向进行自旋转：
 
-<img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions1.gif"/>
+<img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions2.jpg"/>
 
 
 
