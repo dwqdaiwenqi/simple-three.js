@@ -1,2 +1,1 @@
-# simple-three
-simple-three
+# simple-three.js
