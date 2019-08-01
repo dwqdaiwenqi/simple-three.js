@@ -28,13 +28,12 @@ cone模型对象的quaternions_matrix属性赋值为旋转四元数矩阵，rend
 cone.quaternions_matrix = new Float32Array([
  ...  //4*4
 ])
-
 //...
 //render中
-gl.uniformMatrix4fv(this.qua_location, false, this.quaternions_matrix]))
+gl.uniformMatrix4fv(this.qua_location, false, this.quaternions_matrix))
  
 ```
-在获得旋转四元数矩阵前，得知道一个点是如何利用四元数进行旋转的。接下来说说为啥要用就四元数，以及我对四元数的认识
+在获得quaternions_matrix旋转四元数矩阵前，得先知道一个点是如何利用四元数进行旋转的。接下来说说为啥要用就四元数，以及我对四元数的认识
 
 ### 欧拉角
 一般情况下描述一个物体的旋转会使用欧拉角，通过先给定旋转序列xyz，yxz，zxy...，接着再按照顺序分别旋转三个角，有时候你会发现，通过这种方式进行旋转，物体的朝向会显得很怪异，应为你可能旋转了一个正负90度，导致轴和轴重合了，失去了一个自由度，产生了**欧拉角万向死锁**。还有一种情况是，把物体的朝向从一个方向旋转到另一个方向，如果使用欧拉角，那可能会绕个大大的圈子进行旋转，相当的怪异。
