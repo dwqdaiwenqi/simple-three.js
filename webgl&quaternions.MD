@@ -1,6 +1,6 @@
 # 番外
 ## webgl与四元数
-最近一直琢磨着实（手）现（撕）一个精简three.js的库，在实现过程中总会想到利用ArrowHelper那东西进行可视化的调试，所以决定优先实现一个ArrowHelper。
+最近一直琢磨着实（手）现（撕）一个精简three.js的引擎，在实现过程中总会想到利用ArrowHelper那东西进行可视化的调试，所以决定优先实现一个ArrowHelper。
 ArrowHelper长这样，那个绿箭头：
 
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/arrow.jpg"/>
