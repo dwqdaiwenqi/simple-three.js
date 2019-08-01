@@ -109,6 +109,7 @@ requestAnimationFrame(function animate(){
   let xx = x * x2, xy = x * y2, xz = x * z2
   let yy = y * y2, yz = y * z2, zz = z * z2
   let wx = w * x2, wy = w * y2, wz = w * z2
+  // 赋值到quaternions_matrix
   cone.quaternions_matrix = new Float32Array([
     1 - (yy + zz), xy - wz, xz + wy, 0,
     xy + wz, 1 - (xx + zz), yz - wx, 0,
