@@ -136,6 +136,16 @@ requestAnimationFrame(function animate(){
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions2.jpg"/>
 
 
+### OuO
+觉得有用的不错的可以去 https://github.com/dwqdaiwenqi/simple-three.js 查看并点个赞，后面的一步步实现three.js库文章都会在里面更新~
+
+### 参考
+
+https://www.3dgep.com/understanding-quaternions/
+
+https://krasjet.github.io/quaternion/quaternion.pdf
+
+
 
 
 
