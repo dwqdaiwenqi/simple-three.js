@@ -131,7 +131,7 @@ requestAnimationFrame(function animate(){
 }
 ```
 
-戳这个[demo](https://www.xy.com/fed/gl/webgl&quaternions2.html)，cone模型朝着目标方向进行自旋转：
+戳这个[demo](https://www.xy.com/fed/gl/webgl&quaternions.html)，cone模型朝着目标方向进行自旋转：
 
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions2.jpg"/>
 
