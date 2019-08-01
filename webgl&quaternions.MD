@@ -92,24 +92,29 @@ requestAnimationFrame(function animate(){
 #### 旋转模型
 现在已经能使用四元数控制一个点（模型的世界坐标）的旋转，那么也能把四元数旋转应用模型上，让模型朝着目标方向自旋转，表示为旋转四元数q的矩阵形式如下：
 ```js
- //   // 四元数转换到矩阵
+{
+  // 确定目标方向
+  let dir = line.p1.clone().sub(line.p0).normalize()
+  // 与up点乘得到弧度
+  let the = Math.acos(Vector3(0,1,0).dot(dir))
+  // 目标方向与up叉乘得到旋转轴
+  let axis = dir.clone().cross(Vector3(0,1,0))
+  // 得到旋转四元数
   let q = [c(the * .5), axis.clone().normalize().multiplyScalar(s(the * .5))]
 
-  {
-    let x = q[1].x, y = q[1].y, z = q[1].z, w = q[0]
-
-    let x2 = x + x, y2 = y + y, z2 = z + z
-    let xx = x * x2, xy = x * y2, xz = x * z2
-    let yy = y * y2, yz = y * z2, zz = z * z2
-    let wx = w * x2, wy = w * y2, wz = w * z2
-
-    cone.quaternions_matrix = new Float32Array([
-      1 - (yy + zz), xy - wz, xz + wy, 0,
-      xy + wz, 1 - (xx + zz), yz - wx, 0,
-      xz - wy, yz + wx, 1 - (xx + yy), 0,
-      0, 0, 0, 1
-    ])
-  }
+  // 旋转四元数转换为矩阵形式
+  let x = q[1].x, y = q[1].y, z = q[1].z, w = q[0]
+  let x2 = x + x, y2 = y + y, z2 = z + z
+  let xx = x * x2, xy = x * y2, xz = x * z2
+  let yy = y * y2, yz = y * z2, zz = z * z2
+  let wx = w * x2, wy = w * y2, wz = w * z2
+  cone.quaternions_matrix = new Float32Array([
+    1 - (yy + zz), xy - wz, xz + wy, 0,
+    xy + wz, 1 - (xx + zz), yz - wx, 0,
+    xz - wy, yz + wx, 1 - (xx + yy), 0,
+    0, 0, 0, 1
+  ])
+}
 ```
 
 戳这个[demo](https://www.xy.com/fed/gl/webgl&quaternions.html)，cone模型朝着目标方向进行自旋转：
