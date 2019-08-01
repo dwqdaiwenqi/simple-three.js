@@ -33,6 +33,7 @@ void main(){
 
 但是，如果旋转轴q不是特殊的正交轴，p'的结果就不是纯四元数，要使得结果是纯四元数的话必须右乘上共轭q`*`， **p'=qpq`*`** ，在推导过程中还会发现向量的旋转多出了一倍，所以最后得出旋转四元数一般形式为**q=[cos(th/2),sin(th/2)v]**
 
+#### 旋转一个点
 用伪代码来演示下如何用四元数来旋转一个点：
 ```js
 
@@ -76,6 +77,7 @@ requestAnimationFrame(function animate(){
 
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions1.gif"/>
 
+#### 旋转模型
 现在已经能使用四元数控制一个点（模型的世界坐标）的旋转，那么也能把四元数旋转应用模型上，让模型朝着目标方向自旋转，表示为旋转四元数q的矩阵形式如下：
 ```js
  //   // 四元数转换到矩阵
