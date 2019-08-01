@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>webgl&quaternions</title>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+      
+    var glsl = glsl => glsl
+    var [s, c, rand, PI] = [Math.sin, Math.cos, Math.random, Math.PI]
+
+    var Euler = (x = 0, y = 0, z = 0, order = 'XYZ') => {
+      return {
+        x,
+        y,
+        z,
+        order,
+        set (x = 0, y = 0, z = 0, order = 'XYZ'){
+          this.x = x
+          this.y = y
+          this.z = z
+          this.order = order
+        }
+      }
+    }
+
+    var Vector3 = (x = 1, y = 0, z = 0) => {
+      return {
+        x,
+        y,
+        z,
+        set (x = 1, y = 0, z = 0){
+          this.x = x
+          this.y = y
+          this.z = z
+        },
+        add (v){
+          this.x += v.x
+          this.y += v.y
+          this.z += v.z
+          return this
+        },
+        sub (v){
+          this.x -= v.x
+          this.y -= v.y
+          this.z -= v.z
+          return this
+        },
+        length (){
+          return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z)
+        },
+        copy (v){
+          this.x = v.x
+          this.y = v.y
+          this.z = v.z
+          return this
+        },
+        clone (){
+          return Vector3(this.x, this.y, this.z)
+        },
+        dot (v){
+          return this.x * v.x + this.y * v.y + this.z * v.z
+        },
+        normalize (){
+          return this.multiplyScalar(1 / this.length())
+        },
+        cross (b){
+          var a = this
+          var ax = a.x, ay = a.y, az = a.z
+          var bx = b.x, by = b.y, bz = b.z
+
+          this.x = ay * bz - az * by
+          this.y = az * bx - ax * bz
+          this.z = ax * by - ay * bx
+
+          return this
+        },
+        multiplyScalar (s){
+          this.x *= s
+          this.y *= s
+          this.z *= s
+          return this
+        }
+      }
+    }
+
+    var createFragmentShader = (gl, source) => {
+      var shader = gl.createShader(gl.FRAGMENT_SHADER)
+      gl.shaderSource(shader, source)
+      gl.compileShader(shader)
+      var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+      if (success) {
+        return shader
+      }
+      console.log(gl.getShaderInfoLog(shader))
+      gl.deleteShader(shader)
+    }
+    var createVertexShader = (gl, source) => {
+      var shader = gl.createShader(gl.VERTEX_SHADER)
+      gl.shaderSource(shader, source)
+      gl.compileShader(shader)
+      var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
+      if (success) {
+        return shader
+      }
+      console.log(gl.getShaderInfoLog(shader))
+      gl.deleteShader(shader)
+    }
+
+    var createProgram = (gl, vertexShader, fragmentShader) => {
+      var program = gl.createProgram()
+      gl.attachShader(program, vertexShader)
+      gl.attachShader(program, fragmentShader)
+      gl.linkProgram(program)
+      var success = gl.getProgramParameter(program, gl.LINK_STATUS)
+      if (success) {
+        return program
+      }
+      console.log(gl.getProgramInfoLog(program))
+      gl.deleteProgram(program)
+    }
+
+    var Cone = (sides = 20, height = 1, width = 1, co = [1, 1, 1, 1]) => {
+      var that = {
+        render (projection_matrix){
+          var {gl} = this
+          if (!this.program){
+            let vertexShader = createVertexShader(gl, glsl`
+              attribute vec4 a_position;
+              uniform mat4 u_mov_matrix;
+              uniform mat4 u_projection_matrix;
+              uniform mat4 u_quaternions_matrix;
+              void main(){
+                gl_Position = u_projection_matrix*u_quaternions_matrix*u_mov_matrix*a_position;
+              
+              }
+            
+            `)
+            let fragmentShader = createFragmentShader(gl, glsl`
+              precision mediump float;
+              uniform vec4 u_co;
+              void main(){
+                gl_FragColor = vec4(u_co.rgba);
+              }
+            `)
+
+            this.program = createProgram(this.gl, vertexShader, fragmentShader)
+
+            this.po_location = gl.getAttribLocation(this.program, 'a_position')
+            this.mov_location = gl.getUniformLocation(this.program, 'u_mov_matrix')
+            this.qua_location = gl.getUniformLocation(this.program, 'u_quaternions_matrix')
+            this.pro_location = gl.getUniformLocation(this.program, 'u_projection_matrix')
+            this.co_location = gl.getUniformLocation(this.program, 'u_co')
+
+            this.po_buffer = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.po_buffer)
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([...this.vertices]), gl.STATIC_DRAW)
+          }
+          gl.useProgram(this.program)
+
+          {
+            this.idx_buffer = gl.createBuffer()
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.idx_buffer)
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...this.indices]), gl.STATIC_DRAW)
+          }
+
+          gl.enableVertexAttribArray(this.po_location)
+          gl.bindBuffer(gl.ARRAY_BUFFER, this.po_buffer)
+          gl.vertexAttribPointer(this.po_location, 3, gl.FLOAT, false, 0, 0)
+
+          gl.uniform4fv(this.co_location, co)
+
+          gl.uniformMatrix4fv(this.pro_location, false, new Float32Array([...projection_matrix]))
+          gl.uniformMatrix4fv(this.mov_location, false, new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            this.position.x, this.position.y, this.position.z, 1]
+          ))
+
+          gl.uniformMatrix4fv(this.qua_location, false, new Float32Array([
+            ...this.quaternions_matrix
+          ]))
+          gl.drawElements(gl.LINE_STRIP, this.indices.length, gl.UNSIGNED_SHORT, 0)
+        },
+        mov_location: null,
+        pro_location: null,
+        po_location: null,
+        qua_location: null,
+        quaternions_matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        position: Vector3(0, 0, 0),
+        rotation: Euler(0, 0, 0),
+        vertices: [],
+        indices: []
+      }
+      ;(function (){
+        var stepTheta = 2 * Math.PI / sides
+        var verticesPerCap = 9 * sides
+
+        var vertices = []
+        var theta = 0
+        var i = 0
+
+        theta = 0
+        for (; i < verticesPerCap; i += 9) {
+          vertices[i] = Math.cos(theta) * width
+          vertices[i + 1] = -height
+          vertices[i + 2] = Math.sin(theta) * width
+          theta -= stepTheta
+
+          vertices[i + 3] = 0.0
+          vertices[i + 4] = -height
+          vertices[i + 5] = 0.0
+
+          vertices[i + 6] = Math.cos(theta) * width
+          vertices[i + 7] = -height
+          vertices[i + 8] = Math.sin(theta) * width
+        }
+
+        for (let j = 0; j < sides; ++j) {
+          for (let k = 0; k < 3; ++k, ++i) {
+            vertices[i] = vertices[0 + k + 9 * j]
+          }
+
+          for (let k = 0; k < 3; ++k, ++i) {
+            vertices[i] = vertices[6 + k + 9 * j]
+          }
+
+          vertices[i++] = 0.0
+          vertices[i++] = height
+          vertices[i++] = 0.0
+        }
+
+        var indices = new Array(vertices.length / 3)
+        for (i = 0; i < indices.length; ++i) indices[i] = i
+
+        this.vertices = vertices
+        this.indices = indices
+      }).call(that)
+
+      return that
+    }
+
+    var Plane = (sx = 1, sy = 1, nx = 1, ny = 1, co = [1, 0, 1, 1]) => {
+      var that = {
+        render (projection_matrix){
+          var {gl} = this
+          if (!this.program){
+            let vertexShader = createVertexShader(gl, glsl`
+              attribute vec4 a_position;
+              uniform mat4 u_mov_matrix;
+              uniform mat4 u_projection_matrix;
+              uniform mat4 u_rot_matrix;
+              void main(){
+                gl_Position = u_projection_matrix*u_mov_matrix*u_rot_matrix*a_position;
+              }
+            
+            `)
+            let fragmentShader = createFragmentShader(gl, glsl`
+              precision mediump float;
+              uniform vec4 u_co;
+              void main(){
+                gl_FragColor = vec4(u_co.rgba);
+              }
+            `)
+
+            this.program = createProgram(this.gl, vertexShader, fragmentShader)
+
+            this.po_location = gl.getAttribLocation(this.program, 'a_position')
+            this.mov_location = gl.getUniformLocation(this.program, 'u_mov_matrix')
+            this.rot_location = gl.getUniformLocation(this.program, 'u_rot_matrix')
+            this.pro_location = gl.getUniformLocation(this.program, 'u_projection_matrix')
+            this.co_location = gl.getUniformLocation(this.program, 'u_co')
+
+            this.po_buffer = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.po_buffer)
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([...this.vertices]), gl.STATIC_DRAW)
+          }
+          gl.useProgram(this.program)
+
+          {
+            this.idx_buffer = gl.createBuffer()
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.idx_buffer)
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...this.indices]), gl.STATIC_DRAW)
+          }
+
+          gl.enableVertexAttribArray(this.po_location)
+          gl.bindBuffer(gl.ARRAY_BUFFER, this.po_buffer)
+          gl.vertexAttribPointer(this.po_location, 3, gl.FLOAT, false, 0, 0)
+
+          gl.uniform4fv(this.co_location, co)
+
+          gl.uniformMatrix4fv(this.pro_location, false, new Float32Array([...projection_matrix]))
+          gl.uniformMatrix4fv(this.mov_location, false, new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            this.position.x, this.position.y, this.position.z, 1]
+          ))
+
+          var [c_, s_] = [c(this.rotation.x), s(this.rotation.x)]
+
+          gl.uniformMatrix4fv(this.rot_location, false, new Float32Array([1, 0, 0, 0, 0, c_, s_, 0, 0, -s_, c_, 0, 0, 0, 0, 1]))
+
+          gl.drawElements(gl.LINE_STRIP, this.indices.length, gl.UNSIGNED_SHORT, 0)
+        },
+        mov_location: null,
+        pro_location: null,
+        po_location: null,
+        position: Vector3(0, 0, 0),
+        rotation: Euler(0, 0, 0),
+        vertices: [],
+        indices: []
+      }
+      ;(function (){
+        sx = sx || 1
+        sy = sy || 1
+        nx = nx || 1
+        ny = ny || 1
+
+        for (let iy = 0; iy <= ny; iy++) {
+          for (let ix = 0; ix <= nx; ix++) {
+            let u = ix / nx
+            let v = iy / ny
+            let x = -sx / 2 + u * sx
+            let y = sy / 2 - v * sy
+
+            // this.vertices.push(x, 0, y)
+            this.vertices.push(x, y, 0)
+            if (iy < ny && ix < nx) {
+              this.indices.push(iy * (nx + 1) + ix, (iy + 1) * (nx + 1) + ix + 1, iy * (nx + 1) + ix + 1)
+              this.indices.push((iy + 1) * (nx + 1) + ix + 1, iy * (nx + 1) + ix, (iy + 1) * (nx + 1) + ix)
+            }
+          }
+        }
+      }).call(that)
+      return that
+    }
+
+    var Line = (p0, p1, co) => {
+    // console.log(co)
+      var that = {
+        render (projection_matrix){
+          // console.log(projection_matrix)
+          // return
+          var {gl} = this
+          if (!this.program){
+            let vertexShader = createVertexShader(gl, glsl`
+              attribute vec4 a_position;
+              uniform mat4 u_mov_matrix;
+              uniform mat4 u_projection_matrix;
+              void main(){
+                gl_Position = u_projection_matrix*u_mov_matrix*a_position;
+              }
+            
+            `)
+            let fragmentShader = createFragmentShader(gl, glsl`
+              precision mediump float;
+              uniform vec4 u_co;
+              void main(){
+                gl_FragColor = vec4(u_co.rgba);
+              }
+            `)
+
+            this.program = createProgram(this.gl, vertexShader, fragmentShader)
+
+            this.po_location = gl.getAttribLocation(this.program, 'a_position')
+            this.mov_location = gl.getUniformLocation(this.program, 'u_mov_matrix')
+            this.pro_location = gl.getUniformLocation(this.program, 'u_projection_matrix')
+            this.co_location = gl.getUniformLocation(this.program, 'u_co')
+
+            this.po_buffer = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.po_buffer)
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([p0.x, p0.y, p0.z, p1.x, p1.y, p1.z]), gl.STATIC_DRAW)
+          }
+          gl.useProgram(this.program)
+
+          gl.enableVertexAttribArray(this.po_location)
+          gl.bindBuffer(gl.ARRAY_BUFFER, this.po_buffer)
+          gl.vertexAttribPointer(this.po_location, 3, gl.FLOAT, false, 0, 0)
+
+          gl.uniform4fv(this.co_location, co)
+          
+      
+          gl.uniformMatrix4fv(this.pro_location, false, new Float32Array([...projection_matrix]))
+
+          gl.uniformMatrix4fv(this.mov_location, false, new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            this.position[0], this.position[1], this.position[2], 1]
+          ))
+          //gl.lineWidth(1)
+          gl.drawArrays(gl.LINE_STRIP, 0, 2)
+
+          // debugger
+        },
+        mov_location: null,
+        pro_location: null,
+        po_location: null,
+        position: Vector3(0, 0, 0),
+        p0,
+        p1
+      }
+      ;(function (){
+
+      }).call(that)
+      return that
+    }
+
+    var $canvas = document.querySelector('#canvas')
+    $canvas.width = $canvas.height = 600
+    var gl = $canvas.getContext('webgl')
+    var actors = []
+
+    var line_len = 3
+    var line_rad = rand() * PI
+    var line = Line(Vector3(0, 0, 0), Vector3(c(line_rad) * line_len, 3, s(line_rad) * line_len), [0, 0, 1, 1])
+    actors.push(line)
+    line.gl = gl
+    line.position.set(0, 0, 0)
+
+    var floor = Plane(6, 6, 20, 20, [1, 0, 1, 1])
+    floor.gl = gl
+    actors.push(floor)
+    floor.position.set(0, -.5, 0)
+    floor.rotation.set(PI * .5, 0, 0)
+
+    var cone = Cone(10, .1, .05)
+    actors.push(cone)
+    cone.gl = gl
+    cone.position.copy(line.position.clone().add(Vector3(.3 - rand() * .6, .3 - rand() * .6, .3 - rand() * .6)))
+
+    // [sa,a][sb,b]=[sa*sb−a⋅b,sa*b+sb*a+a×b]
+    var multiply = ([sa, a], [sb, b]) => {
+      return [
+        sa * sb - a.dot(b),
+        b.clone().multiplyScalar(sa)
+        .add(a.clone().multiplyScalar(sb))
+        .add(a.clone().cross(b))
+      ]
+    }
+
+    requestAnimationFrame(function animate (){
+      requestAnimationFrame(animate)
+
+      gl.viewport(0, 0, $canvas.width, $canvas.height)
+      gl.clearColor(0, 0, 0, 1)
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+      gl.enable(gl.DEPTH_TEST)
+
+      actors.forEach(o => o.render([
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 1,
+        0, 0, 0, 1
+      ]))
+
+      {
+        let the = .1
+        let axis = line.p1.clone().sub(line.p0)
+
+        let q = [c(the * .5), axis.clone().normalize().multiplyScalar(s(the * .5))]
+
+        let p = [0, cone.position.clone()]
+
+        let q_ = [c(the * .5), axis.clone().normalize().multiplyScalar(-s(the * .5))]
+        // // // //qp
+        let qp = multiply(q, p)
+        // // //qpq*
+        let dest = multiply(qp, q_)
+
+        cone.position.set(dest[1].x, dest[1].y, dest[1].z)
+      }
+    })
+
+  </script>
+</body>
+</html>
