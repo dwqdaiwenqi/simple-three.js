@@ -12,7 +12,7 @@ gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
 // 绘制参数使用gl.LINE_STRIP
 gl.drawArrays(gl.LINE_STRIP, 0, 2)
 ```
-这里已经可以表示出一个指向任意方向的线段了，但麻烦的是其中的Cone模型，模型需要往线段的方向进行自身旋转，四元数是处理这类问题的绝佳工具，最终解决方式是往模模型矩阵中乘上一个旋转四元数矩阵，Cone模型的顶点着色器中大概是这样的：
+这里已经可以表示出一个指向任意方向的线段了，但麻烦的是其中的Cone模型，模型需要往线段的方向进行自身旋转，四元数是处理这类问题的绝佳工具，在模型矩阵里添加一个旋转四元数矩阵，Cone模型的顶点着色器中大概是这样的：
 ```glsl
 //...
 void main(){
@@ -22,7 +22,7 @@ void main(){
   gl_Position = projection_matrix*(quaternions_matrix*mov_matrix)*a_position;
 }
 ```
-cone模型对象的quaternions_matrix属性赋值为旋转四元数矩阵，render中往着色器中quaternions_matrix变量地址传递数据：
+cone模型对象的quaternions_matrix属性赋值为旋转四元数矩阵，render中传递数据到着色器变量：
 ```js
 //...
 cone.quaternions_matrix = new Float32Array([
