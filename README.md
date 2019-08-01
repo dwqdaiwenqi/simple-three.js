@@ -4,8 +4,11 @@
 实现了核心功能
 
 ## 文章列表
-* 番外·webgl与四元数
-* 正传
+* 番外-1 [webgl与四元数](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
+* 正传-1  ..
 
 ## 使用
+```js
 
+
+```
