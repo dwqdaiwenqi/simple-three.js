@@ -12,7 +12,7 @@
 ## 使用
 ```html
 <script type="module">
-  import owo from './owo-gl.js'
+  import owo from './gl-owo.js'
 
   let scene = new owo.Scene()
   let camera = new owo.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 1000)
