@@ -10,27 +10,30 @@
 * 正传-2  ..
 
 ## 使用
-```js
+```html
+<script type="module">
+  import owo from '../src/owo-gl.js'
+   
+  let scene = new owo.Scene()
+  let camera = new owo.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 1000)
 
-let scene = new owo.Scene()
-let camera = new owo.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 1000)
+  let renderer = new owo.WebGLRenderer()
+  renderer.setSize( window.innerWidth, window.innerHeight )
+  document.body.appendChild( renderer.domElement )
 
-let renderer = new owo.WebGLRenderer()
-renderer.setSize( window.innerWidth, window.innerHeight )
-document.body.appendChild( renderer.domElement )
+  let cube = new owo.Mesh(
+    new owo.BoxGeometry(20),
+    new owo.MeshBasicMaterial({color:[0,0,1,1]})
+  )
+  scene.add(cube)
 
-let cube = new owo.Mesh(
-  new owo.BoxGeometry(20),
-  new owo.MeshBasicMaterial({color:[0,0,1,1]})
-)
-scene.add(cube)
-    
-requestAnimationFrame(function animate(){
-  requestAnimationFrame(animate)
-  renderer.render(scene, camera)
-  cube.rotation.x += .1
-})
-
+  requestAnimationFrame(function animate(){
+    requestAnimationFrame(animate)
+    renderer.render(scene, camera)
+    cube.rotation.x += .1
+  })
+  
+</script>
 ```
 
 ## License
