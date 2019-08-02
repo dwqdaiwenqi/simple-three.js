@@ -56,7 +56,7 @@ gl.uniformMatrix4fv(this.qua_location, false, this.quaternions_matrix))
 **ps**：因为四元数和复数的相似性，那么可以设计一个旋转点的四元数，可以表示为`q=[cos(th),sin(th)v]`,设定一个特殊的与某个轴正交的旋转轴q，然后再选一个旋转点p，结果是，如果使用这个正交的旋转轴p，那`p'=qp` 就可以得到结果了，计算出来的是个正确的纯四元数，直接就能用！
 但是，如果旋转轴q不是特殊的正交轴，p'的结果就不是纯四元数，要使得结果是纯四元数的话必须右乘上共轭q`*`， **p'=qpq`*`** ，在推导过程中还会发现向量的旋转多出了一倍，所以最后得出旋转四元数一般形式为**q=[cos(th/2),sin(th/2)v]** 
 
-#### 旋转一个点
+### 旋转一个点
 用伪代码来演示下如何用四元数来旋转一个点：
 ```js
 
@@ -101,8 +101,8 @@ requestAnimationFrame(function animate(){
 
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions1.gif"/>
 
-#### 模型自旋转
-现在已经能使用四元数控制一个点进行旋转了，那么也能把四元数旋转应用到模型上，让模型朝着目标方向自旋转。看这张完成图：
+### 模型自旋转
+现在已经能使用四元数控制一个点进行旋转了，那么也能把四元数旋转应用到模型上，让模型朝着目标方向自旋转。看这下面这张图，cone模型往目标方向完成了旋转：
 
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/applyQuaternions2.jpg"/>
 
