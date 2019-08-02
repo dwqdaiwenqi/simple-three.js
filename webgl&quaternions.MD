@@ -37,9 +37,13 @@ cone.quaternions_matrix = new Float32Array([
  ...  //4*4
 ])
 //...
+
 //render中
-gl.uniformMatrix4fv(this.qua_location, false, this.quaternions_matrix))
- 
+render(){
+//...
+ gl.uniformMatrix4fv(this.qua_location, false, this.quaternions_matrix)
+
+}
 ```
 在得到quaternions_matrix旋转四元数矩阵的结果前，得先解决一个点是如何利用四元数进行旋转的。下面稍微扯下欧拉角，这篇主要是四元数OvO后面会利用四元数来旋转点和模型的自旋转。
 
