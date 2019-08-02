@@ -13,7 +13,7 @@
 ```html
 <script type="module">
   import owo from '../src/owo-gl.js'
-   
+
   let scene = new owo.Scene()
   let camera = new owo.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 1000)
 
@@ -32,7 +32,7 @@
     renderer.render(scene, camera)
     cube.rotation.x += .1
   })
-  
+
 </script>
 ```
 
