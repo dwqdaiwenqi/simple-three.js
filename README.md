@@ -5,12 +5,13 @@
 
 ## 文章列表
 * 番外-1 [webgl与四元数](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
-* ...
+* ...创作中...
 * 正传-1  ..
 * 正传-2  ..
 
 ## 使用
 ```js
+
 let scene = new owo.Scene()
 let camera = new owo.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 1000)
 
