@@ -143,8 +143,6 @@ requestAnimationFrame(function animate(){
 
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions_a.jpg"/>
 <img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions_b.jpg"/>
-<img src="https://raw.githubusercontent.com/dwqdaiwenqi/simple-three/master/quaternions_c.jpg"/>
-
 
 ### OuO
 觉得有用不错的可以去 https://github.com/dwqdaiwenqi/simple-three.js 查看并点个赞~
