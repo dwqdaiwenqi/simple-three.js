@@ -19,6 +19,9 @@ gl.drawArrays(gl.LINE_STRIP, 0, 2)
 ```
 这里已经可以表示出一个指向任意方向的线段了，但麻烦的是其中的Cone模型，模型需要往线段的方向进行自身旋转，四元数是处理这类问题的绝佳工具，在模型矩阵里添加一个旋转四元数矩阵，Cone模型的顶点着色器中大概是这样的：
 ```glsl
+
+//...
+uniform mat4 u_quaternions_matrix;
 //...
 void main(){
   // projection_matrix是投影矩阵
