@@ -84,7 +84,7 @@ let axis = Vector3(.1,.1,0).normalize()
 requestAnimationFrame(function animate(){
  requestAnimationFrame(animate)
  // 需要被旋转的点a，让他为纯四元数，实数部分是0，虚数为一个Vector3向量
- let p = [a, Vector3(x,y,z)]
+ let p = [0, a]
  // 旋转轴 q ,实数为cos(th/2)，虚数为Vector3的单位向量缩放至sin(th/2)
  let q = [cos(th/2), axis.clone().multiplyScalar(sin(th/2))]
  // q的共轭四元数
