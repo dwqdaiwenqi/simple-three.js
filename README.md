@@ -6,8 +6,8 @@
 ## 文章列表
 * 番外-1 [webgl与四元数](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
 * ......创作中
-* 正传-1  ..
-* 正传-2  ..
+* 正传-1  .. 
+* 正传-2  ..  
 
 ## 使用
 ```html
@@ -31,6 +31,7 @@
     requestAnimationFrame(animate)
     renderer.render(scene, camera)
     cube.rotation.x += .1
+  
   })
 
 </script>
