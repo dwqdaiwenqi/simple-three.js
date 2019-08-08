@@ -7,18 +7,18 @@
 * 番外-1 [webgl与四元数](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
 * ......创作中
 * 正传-1  .. 
-* 正传-2  ..  
+* 正传-2  ..      
 
 ## 使用
 ```html
-<script type="module">
-  import owo from './gl-owo.js'
+<script type="module"> 
+  import owo from './gl-owo.js' 
 
   let scene = new owo.Scene()
   let camera = new owo.PerspectiveCamera( 45, innerWidth / innerHeight, 0.1, 1000)
 
   let renderer = new owo.WebGLRenderer()
-  renderer.setSize( window.innerWidth, window.innerHeight )
+  renderer.setSize( window.innerWidth, window.innerHeight ) 
   document.body.appendChild( renderer.domElement )
 
   let cube = new owo.Mesh(
@@ -30,7 +30,7 @@
   requestAnimationFrame(function animate(){
     requestAnimationFrame(animate)
     renderer.render(scene, camera)
-    cube.rotation.x += .1
+    cube.rotation.x += .1 
   
   })
 
