@@ -1,7 +1,7 @@
 # simple-three.js
 一个简单的three.js引擎，用于说明webgl原理，不要用于生产环境！不要用于生产环境！不要用于生产环境！
 
-实现了我觉得特别常用的一些核心功能..
+实现了我觉得特别常用的一些核心功能..    
 
 ## 文章列表
 * 番外-1 [webgl与四元数](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
