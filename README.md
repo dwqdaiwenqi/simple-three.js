@@ -6,7 +6,7 @@
 ## 文章列表
 * 番外-1 [webgl与四元数](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
 * 番外-2 [我的webgl不可能创建一个投影仪owo](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26projection_mapping.MD)
-* 番外-3 [我的webgl不可能为世界中添加影子ovo](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26shadow_mapping.MD)
+* 番外-3 [我的webgl不可能为世界添加影子ovo](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26shadow_mapping.MD)
 * ......创作中
 * 正传-1  .. 
 * 正传-2  ..      
