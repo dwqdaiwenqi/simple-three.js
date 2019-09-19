@@ -14,7 +14,7 @@
 
 ## 使用
 ```html
-<script type="module"> 
+<script type="module">   
   import owo from './gl-owo.js' 
 
   let scene = new owo.Scene()
