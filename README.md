@@ -7,6 +7,7 @@
 * 番外-1 [我的webgl不可能会不使用四元数旋转ouo](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26quaternions.MD)
 * 番外-2 [我的webgl不可能创建一个投影仪owo](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26projection_mapping.MD)
 * 番外-3 [我的webgl不可能为世界创建阴影ovo](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26shadow_mapping.MD)
+* 番外-4 [我的webgl不可能会使用各式各样的滤波器](https://github.com/dwqdaiwenqi/simple-three.js/blob/master/webgl%26shadow_mapping.MD)
 * ......创作中
 * 正传-1  ..  
 * 正传-2  ..      
