@@ -36,11 +36,12 @@
     gl.deleteProgram(program)
   }
   
-  var createVideoTexture = ()=>{source='',width=300,height=200
+  var createVideoTexture = (source='',width=300,height=200)=>{
 		return new Promise(resolve=>{
 			var $video = document.createElement('video')
 
 			$video.addEventListener('loadeddata',()=>{
+
 
 				var tex = gl.createTexture()
         
@@ -255,23 +256,48 @@ var program = createProgram(gl,
 
 {
 
+  // var Projector = {
+  //   img:'./avatar2.jpg',
+  //   tw:580,
+  //   ty:580,
+  //   perspective:[60/180*Math.PI,580/580,.1,8000],
+  //   // 0,-5,-30
+  //   lookAt:[ [$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1],[$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1-1],[0,1,0]    ],
+  //   texture:null,
+
+  //   pro_location:gl.getUniformLocation(program,'u_projector_pro_mat'),
+  //   view_location:gl.getUniformLocation(program,'u_projector_view_mat'),
+  //   tex_location:gl.getUniformLocation(program,'u_projector_texture')
+  // }
+
+  // createTexture(Projector.img).then(texture=>{
+  //   Projector.texture = texture
+  // })
+
   var Projector = {
-    img:'./avatar2.jpg',
-    tw:580,
-    ty:580,
-    perspective:[60/180*Math.PI,580/580,.1,8000],
-    // 0,-5,-30
+		source:'//static.xyimg.net/cn/static/fed/common/media/Galileo180.mp4',
+    perspective:[60/180*Math.PI, 1 ,.1,8000],
     lookAt:[ [$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1],[$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1-1],[0,1,0]    ],
     texture:null,
 
     pro_location:gl.getUniformLocation(program,'u_projector_pro_mat'),
     view_location:gl.getUniformLocation(program,'u_projector_view_mat'),
     tex_location:gl.getUniformLocation(program,'u_projector_texture')
-  }
+	}
 
-  createTexture(Projector.img).then(texture=>{
-    Projector.texture = texture
-  })
+	const p = 750/426
+	// debugger
+	createVideoTexture(Projector.source,300,300/p).then(({$video,texture})=>{
+    
+		Projector.texture = texture
+    Projector.$video = $video
+    
+		$video.play()
+
+    $video.volume =  0
+    Projector.perspective[1] = $video.width/$video.height
+
+	})
 
 }
 
@@ -335,6 +361,28 @@ requestAnimationFrame(function animate(){
     m4.inverse(m4.lookAt(...lookAt))
   )
 
+  // {
+  //   // 投影仪相机视图
+  //   gl.uniformMatrix4fv(
+  //     Projector.pro_location,
+  //     false,
+  //     m4.perspective(...Projector.perspective)
+  //   )
+
+  //   Projector.lookAt[1] = Projector.lookAt[0].concat([]).map((v,i)=>{
+  //     return i===2? v-1:v
+  //   })
+  //   gl.uniformMatrix4fv(
+  //     Projector.view_location,
+  //     false,
+  //     m4.inverse(m4.lookAt(...Projector.lookAt ))
+  //   )
+  //   // 投影仪投影贴图
+  //   gl.activeTexture(gl.TEXTURE0)
+  //   gl.uniform1i(Projector.tex_location, 0)  
+  //   gl.bindTexture(gl.TEXTURE_2D, Projector.texture) 
+
+  // }
   {
     // 投影仪相机视图
     gl.uniformMatrix4fv(
@@ -351,11 +399,15 @@ requestAnimationFrame(function animate(){
       false,
       m4.inverse(m4.lookAt(...Projector.lookAt ))
     )
-    // 投影仪投影贴图
-    gl.activeTexture(gl.TEXTURE0)
-    gl.uniform1i(Projector.tex_location, 0)  
-    gl.bindTexture(gl.TEXTURE_2D, Projector.texture) 
+		// 投影仪投影贴图
 
+		if(Projector.$video){
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,Projector.$video)
+		}
+	
+    gl.activeTexture(gl.TEXTURE0)
+		gl.uniform1i(Projector.tex_location, 0)  
+		gl.bindTexture(gl.TEXTURE_2D, Projector.texture)
   }
   
  
