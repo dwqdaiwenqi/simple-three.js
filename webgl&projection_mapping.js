@@ -1,4 +1,3 @@
-
 // //////////////////////////////////////////////////////////////////////////
 
 var gl = document.querySelector('canvas').getContext('webgl')
@@ -9,20 +8,21 @@ var program = createProgram(gl,
   createVertexShader(gl, glsl`
 		attribute vec4 a_position;
 		attribute vec3 a_normal;
-
     uniform mat4 u_projector_pro_mat;
-    uniform mat4 u_projector_view_mat;
+		uniform mat4 u_projector_view_mat;
+		uniform mat4 u_projector_offset_mat;
+
 
     uniform mat4 u_world_mat;
-
     uniform mat4 u_projection_mat;
     uniform mat4 u_view_mat;
-
     varying vec4 v_projector_texcoord;
 		varying vec3 v_normal;
     void main(){
+
       // -1 --- 1
-			v_projector_texcoord = u_projector_pro_mat*u_projector_view_mat*u_world_mat*a_position;
+			v_projector_texcoord = u_projector_offset_mat*u_projector_pro_mat*u_projector_view_mat*u_world_mat*a_position;
+
 			v_normal = mat3(u_world_mat) * a_normal;
       gl_Position = u_projection_mat*u_view_mat*u_world_mat*a_position;
     }
@@ -37,28 +37,25 @@ var program = createProgram(gl,
 		varying vec4 v_projector_texcoord;
 		varying vec3 v_normal;
     void main(){
-
 			vec3 normal = normalize(v_normal);
-
       float light = dot(normal, normalize(u_light_position));
-
       vec3 ambient_light = vec3(.2);
       
-      vec3 projector_texcoord = (v_projector_texcoord.xyz/v_projector_texcoord.w)*.5+.5;
-      projector_texcoord.y = 1.-projector_texcoord.y;
+      // vec3 projector_texcoord = (v_projector_texcoord.xyz/v_projector_texcoord.w)*.5+.5;
+			// projector_texcoord.y = 1.-projector_texcoord.y;
+
+			vec3 projector_texcoord = v_projector_texcoord.xyz/v_projector_texcoord.w;
 
       bool in_range = 
         projector_texcoord.x >= 0. &&
         projector_texcoord.x <= 1. &&
         projector_texcoord.y >= 0. &&
         projector_texcoord.y <= 1.;
-
       if(in_range ){
 				gl_FragColor = vec4(ambient_light,1)+vec4(texture2D(u_projector_texture,projector_texcoord.xy).rgb*light*.8,1);
       }else{
 				gl_FragColor = vec4(ambient_light,1)+vec4(u_co.rgb*light*.8,1);
       }
-
     }
   `)
 )
@@ -283,7 +280,8 @@ var program_visual = createProgram(gl,
 
     pro_location:gl.getUniformLocation(program,'u_projector_pro_mat'),
     view_location:gl.getUniformLocation(program,'u_projector_view_mat'),
-    tex_location:gl.getUniformLocation(program,'u_projector_texture')
+		tex_location:gl.getUniformLocation(program,'u_projector_texture'),
+		offset_location:gl.getUniformLocation(program,'u_projector_offset_mat')  
 	}
 
 	// createVideoTexture(Projector.source,Projector.tex_w,Projector.tex_h).then(({$video,texture})=>{
@@ -416,9 +414,17 @@ requestAnimationFrame(function animate(){
       Projector.view_location,
       false,
       m4.inverse(m4.lookAt(...Projector.lookAt ))
-    )
+		)
+		
+		// 投影仪纹理偏移
+		gl.uniformMatrix4fv(Projector.offset_location,false,new Float32Array([
+			.5,0,0,0,
+			0,-.5,0,0,
+			0,0,1,0,
+			.5,.5,0,1
+		]))
+		
 		// 投影仪投影贴图
-
 		if(Projector.$video){
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,Projector.$video)
 		}
@@ -493,4 +499,3 @@ requestAnimationFrame(function animate(){
 
   
 })
-
