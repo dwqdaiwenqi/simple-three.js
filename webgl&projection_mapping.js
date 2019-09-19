@@ -265,9 +265,13 @@ var program_visual = createProgram(gl,
 {
 
   var Projector = {
-    source:'//static.xyimg.net/cn/static/fed/common/media/Galileo180.mp4',
-    tex_w:500,
-    tex_h:500/(750/426),
+    //source:'//static.xyimg.net/cn/static/fed/common/media/Galileo180.mp4',
+    // tex_w:500,
+    // tex_h:500/(750/426),
+
+    source:'./projector_texture.jpg',
+    tex_w:512,
+    tex_h:512,
     perspective:[25/180*Math.PI, 1 ,.1,500],
     lookAt:[ 
       [$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1],
@@ -282,22 +286,19 @@ var program_visual = createProgram(gl,
     tex_location:gl.getUniformLocation(program,'u_projector_texture')
 	}
 
-	// // debugger
-	createVideoTexture(Projector.source,Projector.tex_w,Projector.tex_h).then(({$video,texture})=>{
-		Projector.texture = texture
-    Projector.$video = $video
-    
-		$video.play().then(()=>{}).catch(()=>{})
-    $video.volume =  0
-    Projector.perspective[1] = $video.width/$video.height
+	// createVideoTexture(Projector.source,Projector.tex_w,Projector.tex_h).then(({$video,texture})=>{
+	// 	Projector.texture = texture
+  //  Projector.$video = $video
+	// 	$video.play().then(()=>{}).catch(()=>{})
+  //   $video.volume =  0
+  //   Projector.perspective[1] = $video.width/$video.height
 
-  })
-  // debugger
-	// createTexture('./aa.jpg').then(texture=>{
-  //   Projector.texture = texture
-
-  //   Projector.perspective[1] = 580/580
   // })
+
+	createTexture(Projector.source).then(texture=>{
+    Projector.texture = texture
+    Projector.perspective[1] = Projector.tex_w/Projector.tex_h
+  })
     
 }
 
