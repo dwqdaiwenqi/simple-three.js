@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>projection mapping</title>
+</head>
+<body>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+    }
+    #ui{
+      position: absolute;
+      left:0;
+      top:0;
+    }
+  </style>
+  <canvas></canvas>
+  <div id="ui">
+      <!-- -49.5, 0, 77.5 -->
+    <p>camX:<input id="" type="range" min="-500" max="500" value="-114" step=".5"></p>
+    <p>camY:<input id="" type="range" min="-300" max="300" value="92" step=".5"></p>
+    <p>camZ:<input id="" type="range" min="-500" max="500" value="159" step=".5"></p>
+    <p>projectorX:<input id="" type="range" min="-300" max="300" value="0" step=".1"></p>
+    <p>projectorY:<input id="" type="range" min="-300" max="300" value="100" step=".1"></p>
+    <p>projectorZ:<input id="" type="range" min="-300" max="300" value="200" step=".1"></p>
+    <p>lightX:<input id="" type="range" min="-100" max="100" value="0" step="1"></p>
+    <p>lightY:<input id="" type="range" min="-100" max="100" value="-38" step="1"></p>
+    <p>lightZ:<input id="" type="range" min="-100" max="100" value="49" step="1"></p>
+    <p>projectorTargetX:<input id="" type="range" min="-100" max="100" value="0" step="1"></p>
+    <p>projectorTargetY:<input id="" type="range" min="-100" max="100" value="0" step="1"></p>
+    <p>projectorTargetZ:<input id="" type="range" min="-100" max="100" value="0" step="1"></p>
+  </div>
+  <script src="./m4x.js"></script>
+  <script src="./webgl&projection_mapping.js"></script>
+</body>
+</html>
