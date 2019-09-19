@@ -94,6 +94,7 @@
     })
    
   }
+
   var Cube = ()=>{
 		var vertices = [
 			// x,    y,    z
@@ -292,7 +293,7 @@ var program_visual = createProgram(gl,
     precision mediump float;
     uniform vec4 u_co;
     void main(){
-			gl_FragColor = u_co;
+			gl_FragColor = vec4(0,0,1,1);
     }
   `)
 )
@@ -303,13 +304,18 @@ var program_visual = createProgram(gl,
   var [
     $camX,$camY,$camZ,
     $projectorX,$projectorY,$projectorZ,
-    $lightX,$lightY,$lightZ
+    $lightX,$lightY,$lightZ,
+    $projectorTargetX,$projectorTargetY,$projectorTargetZ
   ] = [...document.querySelectorAll('input')]
 
 
   var pro_location = gl.getUniformLocation(program,'u_projection_mat')
   var view_location = gl.getUniformLocation(program,'u_view_mat')
   var light_location = gl.getUniformLocation(program,'u_light_position')
+
+  var visual_pro_location = gl.getUniformLocation(program_visual,'u_projection_mat')
+  var visual_view_location = gl.getUniformLocation(program_visual,'u_view_mat')
+
   var lookAt = [[$camX.value*1,$camY.value*1,$camZ.value*1],[0,0,-20],[0,1,0]]
   var perspective = [45/180*Math.PI,gl.canvas.width/gl.canvas.height,.1,8000]
     
@@ -338,22 +344,19 @@ var program_visual = createProgram(gl,
     Projector.lookAt[0][2] = this.value*1 
     console.log(Projector.lookAt[0])
   }
+  $projectorTargetX.oninput = function(){
+    Projector.lookAt[1][0] = this.value*1 
+    console.log(Projector.lookAt[1])
+  }
+  $projectorTargetY.oninput = function(){
+    Projector.lookAt[1][1] = this.value*1 
+    console.log(Projector.lookAt[1])
+  }
+  $projectorTargetZ.oninput = function(){
+    Projector.lookAt[1][2] = this.value*1 
+    console.log(Projector.lookAt[1])
+  }
 }
-
-
-// // 理解为往这个空间变换，再z方向缩放1000
-// const mat = m4.scale(textureWorldMatrix, 1, 1, 1);
-
-// // Set the uniforms we just computed
-// webglUtils.setUniforms(colorProgramInfo, {
-//   u_color: [0, 0, 0, 1],
-//   u_view: viewMatrix,
-//   u_projection: projectionMatrix,
-//   u_world: mat,
-// });
-
-// pro*view* (light_pro*light_view)*a_position
-
 
 
 {
@@ -362,11 +365,11 @@ var program_visual = createProgram(gl,
     co_location:gl.getUniformLocation(program,'u_co'),
     world_location:gl.getUniformLocation(program,'u_world_mat'),
     normal_location:gl.getAttribLocation(program,'a_normal'),
-    width:50,
-    height:50,
+    width:200,
+    height:200,
     co:[1,0,1,1],
     position:[0,-5,-30],
-    rotation:[0/180*Math.PI,0,0],
+    rotation:[90/180*Math.PI,0,0],
     position_buffer:null
   }
 
@@ -475,16 +478,52 @@ var program_visual = createProgram(gl,
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([...Cube2.normals]),gl.STATIC_DRAW)
 }
 
+{
+  var CubeVisual = Cube()
+  // var CubeVisual = Cylinder()
+	CubeVisual = {
+		...CubeVisual,
+		position_location:gl.getAttribLocation(program_visual,'a_position'),
+    co_location:gl.getUniformLocation(program_visual,'u_co'),
+		world_location:gl.getUniformLocation(program_visual,'u_world_mat'),
+		co:[.3,.3,.3,1],
+		scale:[6,6,6]
+	}
+	CubeVisual.position_buffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER,CubeVisual.position_buffer)
+	gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([...CubeVisual.vertices]),gl.STATIC_DRAW)
+	
+}
+
+
+{
+  var Cube_target = Cube()
+  Cube_target = {
+		...Cube_target,
+		position_location:gl.getAttribLocation(program_visual,'a_position'),
+    co_location:gl.getUniformLocation(program_visual,'u_co'),
+		world_location:gl.getUniformLocation(program_visual,'u_world_mat'),
+		co:[.3,.3,.3,1],
+		position:[$projectorX,$projectorY,$projectorZ],
+		scale:[6,6,6]
+	}
+	Cube_target.position_buffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER,Cube_target.position_buffer)
+	gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([...Cube_target.vertices]),gl.STATIC_DRAW)
+	
+}
 
 {
 
   var Projector = {
-		source:'//static.xyimg.net/cn/static/fed/common/media/Galileo180.mp4',
-    perspective:[60/180*Math.PI, 1 ,.1,8000],
+    source:'//static.xyimg.net/cn/static/fed/common/media/Galileo180.mp4',
+    tex_w:500,
+    tex_h:500/(750/426),
+    perspective:[20/180*Math.PI, 1 ,.1,8000],
     lookAt:[ 
       [$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1],
       // [$projectorX.value*1,$projectorY.value*1,$projectorZ.value*1-1],
-      [...Board.position],
+      [$projectorTargetX.value*1,$projectorTargetY.value*1,$projectorTargetZ.value*1],
       [0,1,0]   
     ],
     texture:null,
@@ -494,9 +533,8 @@ var program_visual = createProgram(gl,
     tex_location:gl.getUniformLocation(program,'u_projector_texture')
 	}
 
-	const p = 750/426
-	// debugger
-	createVideoTexture(Projector.source,300,300/p).then(({$video,texture})=>{
+	// // debugger
+	createVideoTexture(Projector.source,Projector.tex_w,Projector.tex_h).then(({$video,texture})=>{
     
 		Projector.texture = texture
     Projector.$video = $video
@@ -506,7 +544,17 @@ var program_visual = createProgram(gl,
     $video.volume =  0
     Projector.perspective[1] = $video.width/$video.height
 
-	})
+  })
+  // debugger
+	// createTexture('./avatar2.jpg').then(texture=>{
+  //   Projector.texture = texture
+
+  //   Projector.perspective[1] = 580/580
+  // })
+    
+	
+
+	
 
 }
 
@@ -565,58 +613,58 @@ requestAnimationFrame(function animate(){
     // gl.drawArrays(gl.TRIANGLE_FAN,0,4)
 
 
-    // //  box
-    // gl.enableVertexAttribArray(Cube1.position_location)
-    // gl.bindBuffer(gl.ARRAY_BUFFER,Cube1.position_buffer)
-    // gl.vertexAttribPointer(Cube1.position_location,3,gl.FLOAT,false,0,0)
+    //  box
+    gl.enableVertexAttribArray(Cube1.position_location)
+    gl.bindBuffer(gl.ARRAY_BUFFER,Cube1.position_buffer)
+    gl.vertexAttribPointer(Cube1.position_location,3,gl.FLOAT,false,0,0)
 
-    // gl.enableVertexAttribArray(Cube1.normal_location)
-    // gl.bindBuffer(gl.ARRAY_BUFFER,Cube1.normal_buffer)
-    // gl.vertexAttribPointer(Cube1.normal_location,3,gl.FLOAT,false,0,0)
+    gl.enableVertexAttribArray(Cube1.normal_location)
+    gl.bindBuffer(gl.ARRAY_BUFFER,Cube1.normal_buffer)
+    gl.vertexAttribPointer(Cube1.normal_location,3,gl.FLOAT,false,0,0)
     
 
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer())
-    // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...Cube1.indices]), gl.STATIC_DRAW)
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer())
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...Cube1.indices]), gl.STATIC_DRAW)
     
 
-    // gl.uniform4fv(Cube1.co_location,Board_b.co)
+    gl.uniform4fv(Cube1.co_location,Board_b.co)
 
-    // ;[x,y,z] = Cube1.position
-    // mat = m4.translation(x,y,z)
-    // mat = m4.multiply(mat,m4.xRotation(Cube1.rotation[0]))
-    // ;[x,y,z] = Cube1.scale
-    // mat = m4.multiply(mat, m4.scaling(x,y,z))
+    ;[x,y,z] = Cube1.position
+    mat = m4.translation(x,y,z)
+    mat = m4.multiply(mat,m4.xRotation(Cube1.rotation[0]))
+    ;[x,y,z] = Cube1.scale
+    mat = m4.multiply(mat, m4.scaling(x,y,z))
 
-		// gl.uniformMatrix4fv(Cube1.world_location,false,mat)
+		gl.uniformMatrix4fv(Cube1.world_location,false,mat)
 
-    // gl.drawElements(gl.TRIANGLES, Cube1.indices.length, gl.UNSIGNED_SHORT, 0)
+    gl.drawElements(gl.TRIANGLES, Cube1.indices.length, gl.UNSIGNED_SHORT, 0)
 
 
-    //  //  box2
-    //  gl.enableVertexAttribArray(Cube2.position_location)
-    //  gl.bindBuffer(gl.ARRAY_BUFFER,Cube2.position_buffer)
-    //  gl.vertexAttribPointer(Cube2.position_location,3,gl.FLOAT,false,0,0)
+     //  box2
+     gl.enableVertexAttribArray(Cube2.position_location)
+     gl.bindBuffer(gl.ARRAY_BUFFER,Cube2.position_buffer)
+     gl.vertexAttribPointer(Cube2.position_location,3,gl.FLOAT,false,0,0)
  
-    //  gl.enableVertexAttribArray(Cube2.normal_location)
-    //  gl.bindBuffer(gl.ARRAY_BUFFER,Cube2.normal_buffer)
-    //  gl.vertexAttribPointer(Cube2.normal_location,3,gl.FLOAT,false,0,0)
+     gl.enableVertexAttribArray(Cube2.normal_location)
+     gl.bindBuffer(gl.ARRAY_BUFFER,Cube2.normal_buffer)
+     gl.vertexAttribPointer(Cube2.normal_location,3,gl.FLOAT,false,0,0)
      
  
-    //  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer())
-    //  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...Cube2.indices]), gl.STATIC_DRAW)
+     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer())
+     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...Cube2.indices]), gl.STATIC_DRAW)
      
  
-    //  gl.uniform4fv(Cube2.co_location,Board_b.co)
+     gl.uniform4fv(Cube2.co_location,Board_b.co)
  
-    //  ;[x,y,z] = Cube2.position
-    //  mat = m4.translation(x,y,z)
-    //  mat = m4.multiply(mat,m4.xRotation(Cube2.rotation[0]))
-    //  ;[x,y,z] = Cube2.scale
-    //  mat = m4.multiply(mat, m4.scaling(x,y,z))
+     ;[x,y,z] = Cube2.position
+     mat = m4.translation(x,y,z)
+     mat = m4.multiply(mat,m4.xRotation(Cube2.rotation[0]))
+     ;[x,y,z] = Cube2.scale
+     mat = m4.multiply(mat, m4.scaling(x,y,z))
  
-    //  gl.uniformMatrix4fv(Cube2.world_location,false,mat)
+     gl.uniformMatrix4fv(Cube2.world_location,false,mat)
  
-    //  gl.drawElements(gl.TRIANGLES, Cube2.indices.length, gl.UNSIGNED_SHORT, 0)
+     gl.drawElements(gl.TRIANGLES, Cube2.indices.length, gl.UNSIGNED_SHORT, 0)
 
   }
  
@@ -641,9 +689,11 @@ requestAnimationFrame(function animate(){
       m4.perspective(...Projector.perspective)
     )
 
-    Projector.lookAt[1] = Projector.lookAt[0].concat([]).map((v,i)=>{
-      return i===2? v-1:v
-    })
+    // Projector.lookAt[1] = Projector.lookAt[0].concat([]).map((v,i)=>{
+    //   // return i===2? v-1:v
+
+    //   return [0,0,0]
+    // })
     gl.uniformMatrix4fv(
       Projector.view_location,
       false,
@@ -661,6 +711,68 @@ requestAnimationFrame(function animate(){
   }
   
   gl.uniform3fv(light_location,[$lightX.value*1,$lightY.value*1,$lightZ.value*1])
+
+
+
+
+  {
+    //  // 可视化投影仪
+    gl.useProgram(program_visual)
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+    gl.clearColor(0, 1, 1, 1)
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    gl.enable(gl.DEPTH_TEST)
+
+
+    // box target
+    gl.enableVertexAttribArray(Cube_target.position_location)
+    gl.bindBuffer(gl.ARRAY_BUFFER,Cube_target.position_buffer)
+    gl.vertexAttribPointer(Cube_target.position_location,3,gl.FLOAT,false,0,0)
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer())
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...Cube_target.indices]), gl.STATIC_DRAW)
+    
+    gl.uniform4fv(Cube_target.co_location,Cube_target.co)
+		gl.uniformMatrix4fv(Cube_target.world_location,false, m4.translation($projectorTargetX.value*1,$projectorTargetY.value*1,$projectorTargetZ.value*1))
+    gl.drawElements(gl.TRIANGLES, Cube_target.indices.length, gl.UNSIGNED_SHORT, 0)
+
+
+
+    // 投影框绘制
+    // 朝向投影仪方向
+    let mat = m4.lookAt(...Projector.lookAt )
+
+    mat = m4.multiply(mat, m4.xRotation(90/180*Math.PI))
+    mat = m4.multiply(mat, m4.scaling(Projector.tex_w*.5,100,Projector.tex_h*.5))
+
+    gl.uniformMatrix4fv(CubeVisual.world_location,false,mat)
+    
+    gl.enableVertexAttribArray(CubeVisual.position_location)
+    gl.bindBuffer(gl.ARRAY_BUFFER,CubeVisual.position_buffer)
+    gl.vertexAttribPointer(CubeVisual.position_location,3,gl.FLOAT,false,0,0)
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer())
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int16Array([...CubeVisual.indices]), gl.STATIC_DRAW)
+
+    gl.uniform4fv(CubeVisual.co_location,CubeVisual.co)
+    gl.drawElements(gl.LINE_STRIP, CubeVisual.indices.length, gl.UNSIGNED_SHORT, 0)
+
+
+    //
+    gl.uniformMatrix4fv(
+      visual_pro_location,
+      false,
+      m4.perspective(...perspective)
+    )
+    gl.uniformMatrix4fv(
+      visual_view_location,
+      false,
+      m4.inverse(m4.lookAt(...lookAt))
+    )
+  }
+ 
+
   
 })
 
