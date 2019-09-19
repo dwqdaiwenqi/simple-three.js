@@ -1,224 +1,5 @@
 
-{
-  var createFragmentShader = (gl, source) => {
-    var shader = gl.createShader(gl.FRAGMENT_SHADER)
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-    var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
-    if (success) {
-      return shader
-    }
-    console.log(gl.getShaderInfoLog(shader))
-    gl.deleteShader(shader)
-  }
-  var createVertexShader = (gl, source) => {
-    var shader = gl.createShader(gl.VERTEX_SHADER)
-    gl.shaderSource(shader, source)
-    gl.compileShader(shader)
-    var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS)
-    if (success) {
-      return shader
-    }
-    console.log(gl.getShaderInfoLog(shader))
-    gl.deleteShader(shader)
-  }
-  
-  var createProgram = (gl, vertexShader, fragmentShader) => {
-    var program = gl.createProgram()
-    gl.attachShader(program, vertexShader)
-    gl.attachShader(program, fragmentShader)
-    gl.linkProgram(program)
-    var success = gl.getProgramParameter(program, gl.LINK_STATUS)
-    if (success) {
-      return program
-    }
-    console.log(gl.getProgramInfoLog(program))
-    gl.deleteProgram(program)
-  }
-  
-  var createVideoTexture = (source='',width=300,height=200)=>{
-		return new Promise(resolve=>{
-			var $video = document.createElement('video')
-
-      // loadeddata
-      // loadedmetadata 
-			$video.addEventListener('loadedmetadata',()=>{
-
-
-				var tex = gl.createTexture()
-        
-        gl.bindTexture(gl.TEXTURE_2D, tex)
-
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, $video)
-        
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-        
-        resolve({$video,texture:tex})
-        
-        // gl.bindTexture(gl.TEXTURE_2D, null)
-			})
-			$video.crossOrigin = '*'
-			$video.width = width
-			$video.height = height
-			$video.src = source
-			$video.loop = true
-
-		})
-	}
-  var createTexture =(source)=>{
-  
-    var img = document.createElement('img')
-    
-    return new Promise(resolve=>{
-      img.onload = ()=>{
-        var tex = gl.createTexture()
-        
-        gl.bindTexture(gl.TEXTURE_2D, tex)
-        
-        //gl.generateMipmap(gl.TEXTURE_2D)
-
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
-        
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
-        
-        resolve(tex)
-        
-        gl.bindTexture(gl.TEXTURE_2D, null)
-      }
-    
-      img.src = source
-    })
-   
-  }
-
-  var Cube = ()=>{
-		var vertices = [
-			// x,    y,    z
-			// front face (z: +1)
-			 1.0,  1.0,  1.0, // top right
-			-1.0,  1.0,  1.0, // top left
-			-1.0, -1.0,  1.0, // bottom left
-			 1.0, -1.0,  1.0, // bottom right
-			// right face (x: +1)
-			 1.0,  1.0, -1.0, // top right
-			 1.0,  1.0,  1.0, // top left
-			 1.0, -1.0,  1.0, // bottom left
-			 1.0, -1.0, -1.0, // bottom right
-			// top face (y: +1)
-			 1.0,  1.0, -1.0, // top right
-			-1.0,  1.0, -1.0, // top left
-			-1.0,  1.0,  1.0, // bottom left
-			 1.0,  1.0,  1.0, // bottom right
-			// left face (x: -1)
-			-1.0,  1.0,  1.0, // top right
-			-1.0,  1.0, -1.0, // top left
-			-1.0, -1.0, -1.0, // bottom left
-			-1.0, -1.0,  1.0, // bottom right
-			// bottom face (y: -1)
-			 1.0, -1.0,  1.0, // top right
-			-1.0, -1.0,  1.0, // top left
-			-1.0, -1.0, -1.0, // bottom left
-			 1.0, -1.0, -1.0, // bottom right
-			// back face (z: -1)
-			-1.0,  1.0, -1.0, // top right
-			 1.0,  1.0, -1.0, // top left
-			 1.0, -1.0, -1.0, // bottom left
-			-1.0, -1.0, -1.0  // bottom right
-		]
-	
-		var normals = [
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-			0.0, 0.0, 1.0,
-	
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
-			1.0, 0.0, 0.0,
-	
-			0.0, 1.0, 0.0,
-			0.0, 1.0, 0.0,
-			0.0, 1.0, 0.0,
-			0.0, 1.0, 0.0,
-	
-			-1.0, 0.0, 0.0,
-			-1.0, 0.0, 0.0,
-			-1.0, 0.0, 0.0,
-			-1.0, 0.0, 0.0,
-	
-			0.0, -1.0, 0.0,
-			0.0, -1.0, 0.0,
-			0.0, -1.0, 0.0,
-			0.0, -1.0, 0.0,
-	
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0,
-			0.0, 0.0, -1.0
-		];
-	
-		var textures = [
-			1.0, 1.0,
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-	
-			1.0, 1.0,
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-	
-			1.0, 1.0,
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-	
-			1.0, 1.0,
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-	
-			1.0, 1.0,
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-	
-			1.0, 1.0,
-			0.0, 1.0,
-			0.0, 0.0,
-			1.0, 0.0,
-		]
-	
-		var indices = [
-			 0,  1,  2,   0,  2,  3,
-			 4,  5,  6,   4,  6,  7,
-			 8,  9, 10,   8, 10, 11,
-			12, 13, 14,  12, 14, 15,
-			16, 17, 18,  16, 18, 19,
-			20, 21, 22,  20, 22, 23
-		]
-	
-		return {
-			vertices: vertices,
-			textures: textures,
-			normals: normals,
-			indices: indices
-		}
-	}
-  
-  var glsl = glsl => glsl
-  
-}
-
 // //////////////////////////////////////////////////////////////////////////
-
 
 var gl = document.querySelector('canvas').getContext('webgl')
 gl.canvas.width = innerWidth
@@ -502,23 +283,21 @@ var program_visual = createProgram(gl,
 	}
 
 	// // debugger
-	// createVideoTexture(Projector.source,Projector.tex_w,Projector.tex_h).then(({$video,texture})=>{
-	// 	Projector.texture = texture
-  //   Projector.$video = $video
+	createVideoTexture(Projector.source,Projector.tex_w,Projector.tex_h).then(({$video,texture})=>{
+		Projector.texture = texture
+    Projector.$video = $video
     
-	// 	$video.play().then(()=>{}).catch(()=>{})
+		$video.play().then(()=>{}).catch(()=>{})
+    $video.volume =  0
+    Projector.perspective[1] = $video.width/$video.height
 
-  //   alert(123)
-  //   $video.volume =  0
-  //   Projector.perspective[1] = $video.width/$video.height
-
-  // })
-  // debugger
-	createTexture('./aa.jpg').then(texture=>{
-    Projector.texture = texture
-
-    Projector.perspective[1] = 580/580
   })
+  // debugger
+	// createTexture('./aa.jpg').then(texture=>{
+  //   Projector.texture = texture
+
+  //   Projector.perspective[1] = 580/580
+  // })
     
 }
 
